@@ -4,7 +4,11 @@ A small static-site archive built from markdown files by a Python script.
 
 New here? Read **[START_HERE.md](START_HERE.md)** first.
 
-## Quick start
+## One-click launch (Windows)
+
+Double-click `launch-atlas.bat` in the project root. It builds the site, opens your browser, and starts a local server. Press `Ctrl+C` in the terminal window (or close the window) to stop.
+
+## Quick start (manual)
 
 ```
 python scripts/build.py

@@ -6,6 +6,12 @@ A simple step-by-step guide to using ATLAS on your computer. Windows-friendly. R
 
 ATLAS is a small archive of markdown files. A Python script reads those files and turns them into a static website you can open in your browser. There is no database, no server-side application, and no third-party dependencies. You edit markdown; you run one command; you view the result.
 
+## Just want to open ATLAS?
+
+If you only want to view the site, **double-click `launch-atlas.bat`** in the project root. It builds the site, opens your browser, and starts a local server in one step. Press `Ctrl+C` in the terminal window (or close the window) to stop.
+
+The rest of this document explains what is happening underneath and how to do it manually if you prefer or if you ever need to debug.
+
 ## What you need before starting
 
 - **Python 3.8 or later.** Open a terminal and run `python --version`. If you see something like `Python 3.10.11`, you are set. If you get an error, install Python from [python.org/downloads](https://www.python.org/downloads/) and check the box for "Add Python to PATH" during installation.
