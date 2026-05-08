@@ -3,7 +3,7 @@
 ATLAS continuity environment build script.
 
 Reads source markdown files from content/, applies templates from templates/,
-writes static HTML to public/. Stdlib only.
+writes static HTML to docs/. Stdlib only.
 
 Run from the repository root:
     python scripts/build.py
@@ -28,7 +28,10 @@ ROOT = Path(__file__).resolve().parent.parent
 CONTENT = ROOT / "content"
 TEMPLATES = ROOT / "templates"
 STATIC = ROOT / "static"
-PUBLIC = ROOT / "public"
+# Build output directory. We use 'docs/' so GitHub Pages can serve directly
+# from this folder on the main branch (Settings -> Pages -> Source: main, /docs).
+# The same folder works locally with `python -m http.server --directory docs`.
+PUBLIC = ROOT / "docs"
 
 
 # ---------------------------------------------------------------------------
@@ -441,14 +444,34 @@ def _relationship_type(rel: dict[str, str]) -> str | None:
 # ---------------------------------------------------------------------------
 
 def url_for_entity(entity: Entity) -> str:
-    return f"/regions/{entity.region}/{entity.id}.html"
+    """Path from the site root, no leading slash. Combine with site_root prefix."""
+    return f"regions/{entity.region}/{entity.id}.html"
 
 
 def url_for_region(region_id: str) -> str:
-    return f"/regions/{region_id}/index.html"
+    """Path from the site root, no leading slash. Combine with site_root prefix."""
+    return f"regions/{region_id}/index.html"
 
 
-def render_adjacency(entity: Entity, graph: dict[str, Entity]) -> str:
+def site_root_for(output_relpath: str) -> str:
+    """Relative path from the directory of `output_relpath` back to the site
+    root, with trailing slash if non-empty. Examples:
+
+        "index.html"                            -> ""
+        "regions/death/index.html"              -> "../../"
+        "regions/death/concept-death.html"      -> "../../"
+
+    The returned string is meant to be prepended to a site-root-relative URL
+    such as the one returned by url_for_entity().
+    """
+    parts = Path(output_relpath).parts
+    depth = max(len(parts) - 1, 0)
+    return "../" * depth
+
+
+def render_adjacency(
+    entity: Entity, graph: dict[str, Entity], site_root: str
+) -> str:
     rels = entity.metadata.get("relationships") or []
     if not rels:
         return ""
@@ -471,7 +494,7 @@ def render_adjacency(entity: Entity, graph: dict[str, Entity]) -> str:
 
         items.append(
             f'<li><span class="framing">{html.escape(framing, quote=False)}</span> '
-            f'<a href="{url_for_entity(target)}">'
+            f'<a href="{site_root}{url_for_entity(target)}">'
             f'{html.escape(target.title, quote=False)}</a></li>'
         )
 
@@ -492,11 +515,14 @@ def load_template(name: str) -> string.Template:
 
 
 def render_entity_page(entity: Entity, graph: dict[str, Entity]) -> str:
+    output_relpath = url_for_entity(entity)
+    site_root = site_root_for(output_relpath)
+
     template = load_template("entity.html")
     base = load_template("base.html")
 
     body_html = render_markdown(entity.body)
-    adjacency_html = render_adjacency(entity, graph)
+    adjacency_html = render_adjacency(entity, graph, site_root)
 
     transliteration = entity.metadata.get("transliteration", "")
     gloss = entity.metadata.get("gloss", "")
@@ -527,11 +553,14 @@ def render_entity_page(entity: Entity, graph: dict[str, Entity]) -> str:
         page_title=f"{entity.title} — ATLAS",
         content=inner,
         body_class="page-entity",
-        site_root="/",
+        site_root=site_root,
     )
 
 
 def render_region_page(region: Region) -> str:
+    output_relpath = url_for_region(region.id)
+    site_root = site_root_for(output_relpath)
+
     template = load_template("region.html")
     base = load_template("base.html")
 
@@ -579,7 +608,8 @@ def render_region_page(region: Region) -> str:
         entities.sort(key=lambda e: e.id)
         label = t.replace("_", " ").capitalize()
         items = "".join(
-            f'<li><a href="{url_for_entity(e)}">{html.escape(e.title, quote=False)}</a></li>'
+            f'<li><a href="{site_root}{url_for_entity(e)}">'
+            f'{html.escape(e.title, quote=False)}</a></li>'
             for e in entities
         )
         sections.append(
@@ -599,11 +629,13 @@ def render_region_page(region: Region) -> str:
         page_title=f"{region.title} — ATLAS",
         content=inner,
         body_class="page-region",
-        site_root="/",
+        site_root=site_root,
     )
 
 
 def render_homepage(regions: list[Region]) -> str:
+    site_root = site_root_for("index.html")  # "" — homepage is at the root
+
     template = load_template("homepage.html")
     base = load_template("base.html")
 
@@ -614,7 +646,7 @@ def render_homepage(regions: list[Region]) -> str:
         first_para = " ".join(line.strip() for line in first_para.splitlines())
         region_items.append(
             '<article class="region-summary">'
-            f'<h2><a href="{url_for_region(region.id)}">'
+            f'<h2><a href="{site_root}{url_for_region(region.id)}">'
             f'{html.escape(region.title, quote=False)}</a></h2>'
             f'<p>{render_inline(first_para)}</p>'
             '</article>'
@@ -626,7 +658,7 @@ def render_homepage(regions: list[Region]) -> str:
         page_title="ATLAS",
         content=inner,
         body_class="page-home",
-        site_root="/",
+        site_root=site_root,
     )
 
 
@@ -738,14 +770,26 @@ LINK_RE = re.compile(r'href="([^"]+)"')
 
 def check_internal_links(public: Path) -> list[tuple[Path, str]]:
     broken: list[tuple[Path, str]] = []
+    public_resolved = public.resolve()
     for html_file in public.rglob("*.html"):
         text = html_file.read_text(encoding="utf-8")
         for link in LINK_RE.findall(text):
             if link.startswith(("http://", "https://", "#", "mailto:")):
                 continue
-            # Resolve relative to public root.
-            target_path = link.lstrip("/")
-            if not (public / target_path).exists():
+            # Resolve relative to the html file's directory (relative URLs).
+            # Absolute paths starting with "/" are still resolved from the
+            # site root, for backward compatibility.
+            if link.startswith("/"):
+                target = public_resolved / link.lstrip("/")
+            else:
+                target = (html_file.parent / link).resolve()
+            # Reject anything that resolves outside the site root.
+            try:
+                target.relative_to(public_resolved)
+            except ValueError:
+                broken.append((html_file.relative_to(public), link))
+                continue
+            if not target.exists():
                 broken.append((html_file.relative_to(public), link))
     return broken
 

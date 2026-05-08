@@ -19,14 +19,14 @@ After you edit any file in `content/`, `templates/`, or `static/`:
 python scripts/build.py
 ```
 
-This rewrites `public/` from scratch. Build time is under one second on this corpus.
+This rewrites `docs/` from scratch. Build time is under one second on this corpus.
 
 You will see output like:
 
 ```
 Built 24 entities across 2 regions.
 Total authored relationships: 65
-Output: C:\Users\steve\Documents\Claude Workspace\Atlas\prototype_continuity_0_1\public
+Output: C:\Users\steve\Documents\Claude Workspace\Atlas\prototype_continuity_0_1\docs
 ```
 
 If you see anything else (an error, a stack trace), the build failed. Fix the issue named in the error and run again. The site will not have updated on a failed build.
@@ -36,7 +36,7 @@ If you see anything else (an error, a stack trace), the build failed. Fix the is
 Visual check:
 
 ```
-cd public
+cd docs
 python -m http.server 8000
 ```
 
@@ -53,62 +53,46 @@ If all of those pass, the build succeeded. The output line `Built N entities acr
 
 ## Avoiding accidental edits to generated files
 
-The danger: opening a file under `public/` thinking it is source, editing it, then losing those edits the next time the build runs.
+The danger: opening a file under `docs/` thinking it is source, editing it, then losing those edits the next time the build runs.
 
 How to avoid it:
-- Never edit anything under `public/`.
-- If you find yourself looking at a file path that contains `/public/`, you are looking at generated output. Close it. Find the corresponding source file under `content/` instead.
+- Never edit anything under `docs/`.
+- If you find yourself looking at a file path that contains `/docs/`, you are looking at generated output. Close it. Find the corresponding source file under `content/` instead.
 - Source files end in `.md` and live in `content/`, `stewardship/`, or the root.
-- Generated files end in `.html` and live in `public/`.
+- Generated files end in `.html` and live in `docs/`.
 
-If you ever doubt whether a file is source or generated: delete `public/`, run `python scripts/build.py`, and see whether the file came back. If it did, it was generated.
+If you ever doubt whether a file is source or generated: delete `docs/`, run `python scripts/build.py`, and see whether the file came back. If it did, it was generated.
 
 ## Committing to GitHub
 
-First time only:
+After editing source and rebuilding:
 
 ```
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-```
-
-Then create a repository on GitHub (web interface), and run the URL it gives you:
-
-```
-git remote add origin git@github.com:<your-username>/<your-repo>.git
-git push -u origin main
-```
-
-Subsequent commits, after editing source:
-
-```
-python scripts/build.py     # confirm the build still works
+python scripts/build.py     # rebuild so docs/ reflects your edits
 git status                  # see what changed
-git add <files-you-changed>
+git add .                   # stage everything (source + docs/)
 git commit -m "Brief description of the change"
 git push
 ```
 
-`public/` is gitignored, so it will not be included even if you `git add .`. You should never see `public/` in `git status` output.
+`docs/` IS committed (so GitHub Pages can serve the live site). You will see changes to both your source files and the rendered files in `docs/` in `git status`. Both should be committed together. After the push, GitHub Pages updates automatically within about a minute.
 
 ## Pulling changes onto another machine
 
 ```
-git clone git@github.com:<your-username>/<your-repo>.git
-cd <repo-name>
+git clone git@github.com:stevenfrye30/Atlas.git
+cd Atlas
 python scripts/build.py
 ```
 
-That gives you the source plus a freshly built `public/`. View locally as described above.
+That gives you the source plus a freshly built `docs/`. View locally as described above.
 
 ## What you should and should not edit
 
 **Edit freely:**
 - Files in `content/regions/<region>/entities/` — the entity markdown files.
 - Files in `content/regions/<region>/_region.md` — the region articulations.
-- `README.md`.
+- `README.md` and `START_HERE.md`.
 - Files in `stewardship/` — disciplines, conventions, decision records.
 
 **Edit carefully:**
@@ -118,7 +102,7 @@ That gives you the source plus a freshly built `public/`. View locally as descri
 - `.gitignore` — controls what git includes.
 
 **Do not edit:**
-- Anything under `public/`. Always overwritten on next build.
+- Anything under `docs/`. Always overwritten on next build.
 
 ## Running on a new computer
 
@@ -127,7 +111,7 @@ If you move to another machine or set this up for the first time elsewhere:
 1. Install Python 3.8 or later (most systems already have it; check with `python --version`).
 2. Clone the repo (`git clone <url>`) or copy the folder.
 3. Run `python scripts/build.py` to verify the build works.
-4. Run `cd public && python -m http.server 8000` to view.
+4. Run `cd docs && python -m http.server 8000` to view.
 
 No `pip install`, no virtual environment, no other setup is required. The build uses only the Python standard library.
 
@@ -140,7 +124,7 @@ Most failures are validation errors with clear messages naming the file and the 
 - `id 'X' does not match filename 'Y'` — the `id:` in front matter and the filename (without `.md`) must match.
 - `Broken relationship: A -> B` — entity A points to entity B which does not exist. Either create B, or remove the relationship from A.
 - `Duplicate entity id: X` — two files have the same `id:` field. Make them unique.
-- `BROKEN LINK in <file>` — usually means a stale file in `public/`. Delete `public/` and rebuild.
+- `BROKEN LINK in <file>` — usually means a stale file in `docs/`. Delete `docs/` and rebuild.
 
 ## When something else goes wrong
 
@@ -152,3 +136,5 @@ If the rendered site looks wrong (CSS broken, links wrong, content garbled), che
 3. Is your browser caching old CSS? Hard-refresh (`Ctrl+F5` or `Cmd+Shift+R`).
 
 If the local server (`python -m http.server`) won't start: another process is using port 8000. Use a different port (`python -m http.server 8001`).
+
+If the live site at https://stevenfrye30.github.io/Atlas/ shows old content after pushing: wait about a minute and hard-refresh the browser. GitHub Pages takes a moment to redeploy.

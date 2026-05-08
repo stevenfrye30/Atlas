@@ -1,18 +1,22 @@
-# ATLAS
+# Open ATLAS
 
-A small static-site archive built from markdown files by a Python script.
+[Launch ATLAS](https://stevenfrye30.github.io/Atlas/)
 
-New here? Read **[START_HERE.md](START_HERE.md)** first.
+---
 
-## One-click launch (Windows)
+A small static-site archive built from markdown files by a Python script. The link above opens the live reading environment in your browser; nothing else is required.
+
+If you want to run or edit ATLAS locally, read on. New to the project? Read **[START_HERE.md](START_HERE.md)** first.
+
+## One-click local launch (Windows)
 
 Double-click `launch-atlas.bat` in the project root. It builds the site, opens your browser, and starts a local server. Press `Ctrl+C` in the terminal window (or close the window) to stop.
 
-## Quick start (manual)
+## Manual local build and view
 
 ```
 python scripts/build.py
-cd public && python -m http.server 8000
+cd docs && python -m http.server 8000
 ```
 
 Then open `http://localhost:8000`. Stop the server with `Ctrl+C`.
@@ -26,7 +30,7 @@ Then open `http://localhost:8000`. Stop the server with `Ctrl+C`.
 | `templates/` | Source: HTML templates the build script uses | Carefully |
 | `static/` | Source: CSS file | Carefully |
 | `scripts/` | Source: the build script | Carefully |
-| `public/` | **Generated** — rebuilt every time you run the build | **No, ever** |
+| `docs/` | **Generated** — the rendered site, rebuilt by `python scripts/build.py`. Committed so GitHub Pages can serve it. | **No, ever** |
 
 ## What to edit
 
@@ -37,28 +41,20 @@ Then open `http://localhost:8000`. Stop the server with `Ctrl+C`.
 
 ## What not to touch
 
-- Anything inside `public/`. It is rebuilt from source on every `python scripts/build.py` run. Edits there are overwritten.
+- Anything inside `docs/`. It is rebuilt from source on every `python scripts/build.py` run. Edits there are overwritten.
 
-## Rebuilding
-
-After any edit:
+## Update workflow
 
 ```
-python scripts/build.py
+# 1. edit source files under content/, stewardship/, templates/, static/, or scripts/
+python scripts/build.py            # 2. regenerate docs/
+git status                         # 3. see what changed
+git add .                          # 4. stage edits + new docs/
+git commit -m "brief message"      # 5. commit
+git push                           # 6. push — GitHub Pages updates automatically
 ```
 
-A successful build prints `Built N entities across M regions.` Errors name the file and the problem.
-
-## GitHub workflow
-
-```
-git status                          # see what changed
-git add <files>                     # stage your changes
-git commit -m "brief message"       # commit
-git push                            # send to GitHub
-```
-
-`public/` is gitignored and will not appear in `git status`.
+GitHub Pages serves `docs/` from the `main` branch. Pushing a commit that updates `docs/` updates the live site within about a minute.
 
 ## More documentation
 
@@ -85,7 +81,8 @@ Python 3.8 or later. Standard library only — no `pip install` required.
 | Problem | Fix |
 |---|---|
 | Build fails with `VALIDATION ERROR` | Error names the file. Fix the front matter or relationship target. |
-| Build fails with `BROKEN LINK` | Stale file in `public/`. Delete `public/` and rebuild. |
-| Page looks unstyled | You opened `public/index.html` directly. Use the local server (above). |
-| Port 8000 in use | Use a different port: `python -m http.server 8001` |
+| Build fails with `BROKEN LINK` | Stale file in `docs/`. Delete `docs/` and rebuild. |
+| Live site shows old content after pushing | Wait ~1 minute. GitHub Pages takes a moment to redeploy. Hard-refresh the browser (`Ctrl+F5`). |
+| Live site is missing CSS or pages | Confirm `docs/` was committed and pushed. Check the GitHub Pages settings: source `main`, folder `/docs`. |
+| Port 8000 in use locally | Use a different port: `python -m http.server 8001` |
 | `python: command not found` | Try `python3`, or install Python from [python.org](https://www.python.org/downloads/). |

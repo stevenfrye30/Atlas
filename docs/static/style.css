@@ -1,0 +1,393 @@
+/*
+ * ATLAS — first continuity environment prototype.
+ *
+ * A single hand-written stylesheet. No preprocessor, no framework, no
+ * decorative motion. The intent is quiet, stable, readable presentation.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Tokens                                                              */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --bg:        #fafaf6;
+  --fg:        #1f1d1a;
+  --fg-muted:  #6a6864;
+  --rule:      #d8d6cf;
+  --link:      #6b3a1f;
+  --link-hover:#8a4a28;
+  --measure:   38em;
+
+  --font-body: Charter, "Iowan Old Style", "Source Serif Pro",
+               "Hoefler Text", Georgia, "Times New Roman", serif;
+
+  --base:    1.125rem;   /* 18px */
+  --leading: 1.65;
+
+  --space-1: 0.5rem;
+  --space-2: 1rem;
+  --space-3: 1.5rem;
+  --space-4: 2.5rem;
+  --space-5: 4rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reset & base                                                        */
+/* ------------------------------------------------------------------ */
+
+* { box-sizing: border-box; }
+
+html {
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--base);
+  line-height: var(--leading);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--link);
+  text-decoration: underline;
+  text-decoration-thickness: 0.5px;
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--link-hover);
+}
+
+a:visited {
+  color: var(--link);
+}
+
+p {
+  margin: 0 0 var(--space-2) 0;
+}
+
+ul {
+  margin: 0 0 var(--space-2) 0;
+  padding-left: 1.25rem;
+}
+
+li {
+  margin-bottom: 0.25rem;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  line-height: 1.25;
+  margin: 0 0 var(--space-2) 0;
+}
+
+h1 { font-size: 1.6rem; }
+h2 { font-size: 1.2rem; margin-top: var(--space-3); }
+h3 { font-size: 1.05rem; margin-top: var(--space-3); }
+
+em { font-style: italic; }
+strong { font-weight: 600; }
+
+/* ------------------------------------------------------------------ */
+/* Page frame                                                          */
+/* ------------------------------------------------------------------ */
+
+.site-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  max-width: var(--measure);
+  margin: var(--space-4) auto var(--space-3);
+  padding: 0 var(--space-2);
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: var(--space-2);
+}
+
+.site-name {
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  color: var(--fg);
+}
+
+.site-nav a {
+  margin-left: var(--space-2);
+  font-size: 0.95rem;
+  text-decoration: none;
+  color: var(--fg-muted);
+}
+
+.site-nav a:hover {
+  color: var(--fg);
+}
+
+main {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: var(--space-3) var(--space-2) var(--space-5);
+}
+
+.site-footer {
+  max-width: var(--measure);
+  margin: var(--space-5) auto var(--space-4);
+  padding: var(--space-2);
+  border-top: 1px solid var(--rule);
+  font-size: 0.875rem;
+  color: var(--fg-muted);
+}
+
+.site-footer p {
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Homepage                                                            */
+/* ------------------------------------------------------------------ */
+
+.homepage h1 {
+  font-size: 2rem;
+  margin-bottom: var(--space-3);
+}
+
+.homepage .orientation {
+  margin-bottom: var(--space-4);
+}
+
+.region-list h2 {
+  font-size: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-3);
+}
+
+.region-summary {
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+}
+
+.region-summary h2 {
+  font-size: 1.3rem;
+  margin: 0 0 var(--space-1) 0;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--fg);
+}
+
+.region-summary h2 a {
+  text-decoration: none;
+  color: var(--fg);
+}
+
+.region-summary h2 a:hover {
+  color: var(--link);
+}
+
+.region-summary p {
+  margin: 0;
+  color: var(--fg-muted);
+}
+
+/* ------------------------------------------------------------------ */
+/* Region pages                                                        */
+/* ------------------------------------------------------------------ */
+
+.region h1 {
+  font-size: 2rem;
+  margin-bottom: var(--space-3);
+}
+
+.region-prose {
+  margin-bottom: var(--space-4);
+}
+
+.entity-group {
+  margin-bottom: var(--space-3);
+}
+
+.entity-group h2 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-1);
+}
+
+.entity-group ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.entity-group li {
+  margin-bottom: 0.35rem;
+}
+
+/* ------------------------------------------------------------------ */
+/* Entity pages                                                        */
+/* ------------------------------------------------------------------ */
+
+.entity-header {
+  margin-bottom: var(--space-3);
+}
+
+.entity-meta {
+  margin: 0 0 var(--space-1) 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+  color: var(--fg-muted);
+  text-transform: lowercase;
+}
+
+.entity h1 {
+  font-size: 1.9rem;
+  margin: 0 0 var(--space-1) 0;
+}
+
+.entity .subtitle {
+  margin: 0 0 var(--space-2) 0;
+  color: var(--fg-muted);
+  font-style: italic;
+}
+
+.entity .subtitle .gloss {
+  font-style: normal;
+}
+
+.entity-body p {
+  margin-bottom: var(--space-2);
+}
+
+.entity-body h2 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Blockquotes & attributions                                          */
+/* ------------------------------------------------------------------ */
+
+blockquote {
+  margin: var(--space-2) 0 var(--space-1) 0;
+  padding: 0.25rem 0 0.25rem var(--space-2);
+  border-left: 2px solid var(--rule);
+  font-style: normal;
+  color: var(--fg);
+}
+
+blockquote em {
+  font-style: italic;
+}
+
+/* Original-script blockquotes get language-specific treatment.
+ * Each language class can override font-family, size, and rhythm
+ * appropriate to the script. */
+
+blockquote.lang-zh,
+blockquote.lang-pi,
+blockquote.lang-grc {
+  font-style: normal;
+  line-height: 1.7;
+}
+
+blockquote.lang-zh {
+  /* Classical Chinese: the system fallback chain handles CJK gracefully
+   * on most platforms. We avoid prescribing a specific font. */
+  font-size: 1.1em;
+  letter-spacing: 0.04em;
+}
+
+blockquote.lang-grc {
+  /* Polytonic Greek renders well in our base serif on most systems. */
+  font-size: 1em;
+}
+
+blockquote.lang-pi {
+  /* Pāli in Latin transliteration with diacritics. */
+  font-size: 1em;
+}
+
+p.attribution {
+  margin: 0 0 var(--space-3) var(--space-2);
+  font-size: 0.9em;
+  color: var(--fg-muted);
+}
+
+p.attribution em {
+  font-style: italic;
+}
+
+/* ------------------------------------------------------------------ */
+/* Adjacency                                                           */
+/* ------------------------------------------------------------------ */
+
+.adjacency {
+  margin-top: var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--rule);
+}
+
+.adjacency h2 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--fg-muted);
+  margin-bottom: var(--space-2);
+  margin-top: 0;
+}
+
+.adjacency ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.adjacency li {
+  margin-bottom: 0.5rem;
+}
+
+.adjacency .framing {
+  color: var(--fg-muted);
+  font-size: 0.95em;
+}
+
+/* ------------------------------------------------------------------ */
+/* Responsive                                                          */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 40em) {
+  :root { --base: 1.0625rem; }
+
+  .site-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .site-nav {
+    margin-top: var(--space-1);
+  }
+
+  .site-nav a:first-child {
+    margin-left: 0;
+  }
+
+  main {
+    padding: var(--space-2);
+  }
+
+  .homepage h1,
+  .region h1,
+  .entity h1 {
+    font-size: 1.6rem;
+  }
+}

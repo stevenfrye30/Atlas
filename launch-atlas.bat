@@ -59,7 +59,7 @@ REM Start the local server. It runs until you stop it.
 REM If port 8000 is already in use, Python will print an error here
 REM ("OSError: [WinError 10048]..."). Close whatever else is using
 REM port 8000, or edit this file to use a different port.
-python -m http.server 8000 --directory public
+python -m http.server 8000 --directory docs
 
 echo.
 pause

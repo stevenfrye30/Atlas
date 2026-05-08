@@ -1,4 +1,5 @@
-# Build output
+# Old build output (kept ignored in case any stale public/ folder exists locally).
+# Current build output goes to docs/ which IS committed so GitHub Pages can serve it.
 public/
 
 # Python

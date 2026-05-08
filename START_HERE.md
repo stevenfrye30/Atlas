@@ -2,13 +2,23 @@
 
 A simple step-by-step guide to using ATLAS on your computer. Windows-friendly. Read this once; after that you will likely only need the README.
 
+## Just want to read ATLAS?
+
+The live reading environment is at:
+
+**[https://stevenfrye30.github.io/Atlas/](https://stevenfrye30.github.io/Atlas/)**
+
+That link opens the actual site in any browser. No setup is required.
+
+Continue reading this document only if you want to **edit** ATLAS or **run it locally**.
+
 ## What ATLAS is, in one paragraph
 
 ATLAS is a small archive of markdown files. A Python script reads those files and turns them into a static website you can open in your browser. There is no database, no server-side application, and no third-party dependencies. You edit markdown; you run one command; you view the result.
 
-## Just want to open ATLAS?
+## Local one-click launch
 
-If you only want to view the site, **double-click `launch-atlas.bat`** in the project root. It builds the site, opens your browser, and starts a local server in one step. Press `Ctrl+C` in the terminal window (or close the window) to stop.
+If you have the project on your computer and want to view it locally, **double-click `launch-atlas.bat`** in the project root. It builds the site, opens your browser, and starts a local server in one step. Press `Ctrl+C` in the terminal window (or close the window) to stop.
 
 The rest of this document explains what is happening underneath and how to do it manually if you prefer or if you ever need to debug.
 
@@ -52,7 +62,7 @@ To confirm you are in the right place:
 ls
 ```
 
-You should see `README.md`, `START_HERE.md`, `content`, `scripts`, `static`, `stewardship`, `templates`, and (if you have built before) `public`.
+You should see `README.md`, `START_HERE.md`, `content`, `scripts`, `static`, `stewardship`, `templates`, `launch-atlas.bat`, and `docs` (the rendered site).
 
 ## Step 3 — Build the site
 
@@ -60,24 +70,24 @@ You should see `README.md`, `START_HERE.md`, `content`, `scripts`, `static`, `st
 python scripts/build.py
 ```
 
-This reads the markdown files and writes the website into a folder called `public/`. It takes about one second.
+This reads the markdown files and writes the website into a folder called `docs/`. It takes about one second.
 
 If the build worked, you will see something like:
 
 ```
 Built 24 entities across 2 regions.
 Total authored relationships: 65
-Output: C:\Users\steve\Documents\Claude Workspace\Atlas\prototype_continuity_0_1\public
+Output: C:\Users\steve\Documents\Claude Workspace\Atlas\prototype_continuity_0_1\docs
 ```
 
 If anything else appears (error, traceback), the build failed. Read the message — it names the file and what is wrong.
 
 ## Step 4 — Start a local web server
 
-The site uses absolute URLs (e.g., `/static/style.css`), so opening `public/index.html` directly will not work properly. Instead, run a small local web server. Python has one built in.
+The simplest way to view the rendered site is a small local web server. Python has one built in.
 
 ```
-cd public
+cd docs
 python -m http.server 8000
 ```
 
@@ -135,7 +145,7 @@ Then rebuild:
 python scripts/build.py
 ```
 
-If the build succeeds, the change is already in `public/`. If the local server is still running, refresh the browser tab to see the change. If it is not running, restart it as in Step 4.
+If the build succeeds, the change is already in `docs/`. If the local server is still running, refresh the browser tab to see the change. If it is not running, restart it as in Step 4.
 
 ## Step 9 — Commit changes to GitHub
 
@@ -155,7 +165,7 @@ git push
 
 The first two commands stage and record your change locally. `git push` sends it to GitHub.
 
-`public/` will not appear in `git status` because it is gitignored. Only your source edits will be staged.
+`git status` will show changes to your source files **and** to files inside `docs/`. Both should be committed: `docs/` is the rendered site that GitHub Pages serves, and committing it is how the live site updates. After the push, GitHub Pages updates automatically within about a minute.
 
 ## Doing it all in one terminal session
 
@@ -164,7 +174,7 @@ Here is a typical session, start to finish:
 ```
 cd "C:\Users\steve\Documents\Claude Workspace\Atlas\prototype_continuity_0_1"
 python scripts/build.py
-cd public
+cd docs
 python -m http.server 8000
 ```
 
@@ -195,7 +205,7 @@ The GitHub repository name is independent of the local folder name. Renaming loc
 | I want to... | Run this |
 |---|---|
 | See if anything is broken | `python scripts/build.py` |
-| View the site | `cd public && python -m http.server 8000`, then open `http://localhost:8000` |
+| View the site | `cd docs && python -m http.server 8000`, then open `http://localhost:8000` |
 | Stop the server | `Ctrl+C` |
 | See what I changed | `git status` |
 | Save changes to GitHub | `git add . && git commit -m "msg" && git push` |
@@ -203,7 +213,7 @@ The GitHub repository name is independent of the local folder name. Renaming loc
 
 ## Things to remember
 
-- **Never edit anything in `public/`.** It is rebuilt from scratch every time. Source files live in `content/`, `templates/`, `static/`, `scripts/`, and `stewardship/`.
+- **Never edit anything in `docs/`.** It is rebuilt from scratch every time. Source files live in `content/`, `templates/`, `static/`, `scripts/`, and `stewardship/`.
 - **Always rebuild after editing.** If you edit a markdown file but do not rebuild, the website does not update. Run `python scripts/build.py`.
 - **The local server is just for viewing.** It does not need to be running unless you are looking at the site.
 - **Errors name the file and the problem.** Read the message before guessing.
@@ -213,8 +223,8 @@ The GitHub repository name is independent of the local folder name. Renaming loc
 Most issues come from one of these:
 
 1. **Forgot to rebuild after editing.** Run `python scripts/build.py` and refresh the browser.
-2. **Editing the wrong file.** If your changes do not appear, check the file path. It should be inside `content/`, not `public/`.
-3. **CSS not loading.** You opened `public/index.html` directly. Use the local server.
+2. **Editing the wrong file.** If your changes do not appear, check the file path. It should be inside `content/`, not `docs/`.
+3. **CSS not loading via local server.** Make sure you ran `python -m http.server 8000` from inside `docs/`, not from the project root.
 4. **Build error.** Read the message. It usually says "Missing field X in Y" or "Broken relationship A -> B."
 
 For more detail, see [stewardship/local-use.md](stewardship/local-use.md).
