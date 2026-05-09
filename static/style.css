@@ -125,6 +125,13 @@ strong { font-weight: 600; }
   color: var(--fg);
 }
 
+.site-nav a.hub-link {
+  font-style: italic;
+  border-right: 1px solid var(--rule);
+  padding-right: var(--space-2);
+  margin-right: 0;
+}
+
 main {
   max-width: var(--measure);
   margin: 0 auto;
